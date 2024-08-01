@@ -5,10 +5,29 @@ import { Link } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Search, Zap, ExternalLink } from 'lucide-react';
+import { LineChart, Line, ResponsiveContainer } from 'recharts';
 
 const fetchCoins = async () => {
   const response = await axios.get('https://api.coincap.io/v2/assets?limit=100');
-  return response.data.data;
+  const coins = response.data.data;
+
+  // Fetch 7-day history for each coin
+  const coinsWithHistory = await Promise.all(
+    coins.map(async (coin) => {
+      const end = Date.now();
+      const start = end - 7 * 24 * 60 * 60 * 1000; // 7 days ago
+      const historyResponse = await axios.get(`https://api.coincap.io/v2/assets/${coin.id}/history?interval=h12&start=${start}&end=${end}`);
+      return {
+        ...coin,
+        history: historyResponse.data.data.map(dataPoint => ({
+          time: dataPoint.time,
+          price: parseFloat(dataPoint.priceUsd)
+        }))
+      };
+    })
+  );
+
+  return coinsWithHistory;
 };
 
 const getTopGainers = (coins, limit = 5) => {
@@ -87,6 +106,7 @@ const Index = () => {
               <TableHead className="text-purple-300">Price</TableHead>
               <TableHead className="text-purple-300">24h Flux</TableHead>
               <TableHead className="text-purple-300">Market Cap</TableHead>
+              <TableHead className="text-purple-300">7-Day Trend</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -108,6 +128,13 @@ const Index = () => {
                   {parseFloat(coin.changePercent24Hr).toFixed(2)}%
                 </TableCell>
                 <TableCell className="font-mono">${parseFloat(coin.marketCapUsd).toLocaleString(undefined, { maximumFractionDigits: 0 })}</TableCell>
+                <TableCell className="w-24">
+                  <ResponsiveContainer width="100%" height={50}>
+                    <LineChart data={coin.history}>
+                      <Line type="monotone" dataKey="price" stroke={parseFloat(coin.changePercent24Hr) > 0 ? '#4ade80' : '#f87171'} strokeWidth={2} dot={false} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
