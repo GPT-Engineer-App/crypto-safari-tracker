@@ -80,6 +80,10 @@ const CryptoDetails = () => {
           <p className="mb-2"><span className="font-bold">Market Cap:</span> ${parseFloat(coinDetails.marketCapUsd).toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
           <p className="mb-2"><span className="font-bold">24h Change:</span> <span className={parseFloat(coinDetails.changePercent24Hr) > 0 ? 'text-green-400' : 'text-red-400'}>{parseFloat(coinDetails.changePercent24Hr).toFixed(2)}%</span></p>
           <p className="mb-2"><span className="font-bold">Volume (24h):</span> ${parseFloat(coinDetails.volumeUsd24Hr).toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+          <p className="mb-2"><span className="font-bold">Supply:</span> {parseFloat(coinDetails.supply).toLocaleString(undefined, { maximumFractionDigits: 0 })} {coinDetails.symbol}</p>
+          <p className="mb-2"><span className="font-bold">Max Supply:</span> {coinDetails.maxSupply ? parseFloat(coinDetails.maxSupply).toLocaleString(undefined, { maximumFractionDigits: 0 }) : 'Unlimited'} {coinDetails.symbol}</p>
+          <p className="mb-2"><span className="font-bold">Circulating Supply:</span> {parseFloat(coinDetails.supply).toLocaleString(undefined, { maximumFractionDigits: 0 })} {coinDetails.symbol}</p>
+          <p className="mb-2"><span className="font-bold">VWAP (24h):</span> ${parseFloat(coinDetails.vwap24Hr).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
         </div>
         <div className="bg-purple-900 p-6 rounded-lg shadow-lg">
           <h2 className="text-xl font-semibold mb-4 text-purple-300">Price History (30 Days)</h2>
@@ -93,6 +97,11 @@ const CryptoDetails = () => {
             </LineChart>
           </ResponsiveContainer>
         </div>
+      </div>
+      <div className="bg-purple-900 p-6 rounded-lg shadow-lg mt-8">
+        <h2 className="text-xl font-semibold mb-4 text-purple-300">About {coinDetails.name}</h2>
+        <p className="text-purple-200">{coinDetails.name} is a cryptocurrency with the symbol {coinDetails.symbol}. It is currently ranked #{coinDetails.rank} by market cap. The current price is ${parseFloat(coinDetails.priceUsd).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} with a 24-hour trading volume of ${parseFloat(coinDetails.volumeUsd24Hr).toLocaleString(undefined, { maximumFractionDigits: 0 })}. The circulating supply is {parseFloat(coinDetails.supply).toLocaleString(undefined, { maximumFractionDigits: 0 })} {coinDetails.symbol}.</p>
+        <p className="mt-4 text-purple-200">For more information, visit the official website or check out cryptocurrency exchanges that support {coinDetails.symbol}.</p>
       </div>
     </div>
   );
