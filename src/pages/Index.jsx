@@ -176,6 +176,7 @@ const Index = () => {
         </Table>
       </div>
     </div>
+  </div>
   );
 };
 
