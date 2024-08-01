@@ -33,8 +33,8 @@ const Index = () => {
   if (isError) return <div className="text-center mt-8">Error fetching data</div>;
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Cryptocurrency Tracker</h1>
+    <div className="py-8">
+      <h1 className="text-3xl font-bold mb-6 text-center">Cryptocurrency Tracker</h1>
       <div className="relative mb-4">
         <Input
           type="text"
