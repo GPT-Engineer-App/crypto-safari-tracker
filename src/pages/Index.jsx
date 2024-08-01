@@ -113,8 +113,6 @@ const Index = () => {
           </TableBody>
         </Table>
       </div>
-    </div>
-
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12">
       <div>
         <h2 className="text-2xl font-bold mb-4 text-purple-300">Biggest Gainers</h2>
