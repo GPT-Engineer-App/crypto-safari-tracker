@@ -3,9 +3,10 @@ import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { useToast } from "@/components/ui/use-toast";
 
 const fetchCoinDetails = async (id) => {
   const response = await axios.get(`https://api.coincap.io/v2/assets/${id}`);
@@ -21,6 +22,7 @@ const fetchCoinHistory = async (id) => {
 
 const CryptoDetails = () => {
   const { id } = useParams();
+  const { toast } = useToast();
 
   const { data: coinDetails, isLoading: isLoadingDetails, isError: isErrorDetails } = useQuery({
     queryKey: ['coinDetails', id],
@@ -32,6 +34,23 @@ const CryptoDetails = () => {
     queryFn: () => fetchCoinHistory(id),
   });
 
+  const addToFavorites = () => {
+    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+    if (!favorites.includes(id)) {
+      favorites.push(id);
+      localStorage.setItem('favorites', JSON.stringify(favorites));
+      toast({
+        title: "Added to Favorites",
+        description: `${coinDetails.name} has been added to your favorites.`,
+      });
+    } else {
+      toast({
+        title: "Already in Favorites",
+        description: `${coinDetails.name} is already in your favorites.`,
+      });
+    }
+  };
+
   if (isLoadingDetails || isLoadingHistory) return <div className="text-center mt-8 font-mono text-purple-400">Decrypting asset data...</div>;
   if (isErrorDetails || isErrorHistory) return <div className="text-center mt-8 font-mono text-red-400">Error: Asset data breach detected</div>;
 
@@ -42,11 +61,16 @@ const CryptoDetails = () => {
 
   return (
     <div className="py-8">
-      <Link to="/">
-        <Button variant="outline" className="mb-4">
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Assets
+      <div className="flex justify-between items-center mb-4">
+        <Link to="/">
+          <Button variant="outline">
+            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Assets
+          </Button>
+        </Link>
+        <Button variant="outline" onClick={addToFavorites}>
+          <Star className="mr-2 h-4 w-4" /> Add to Favorites
         </Button>
-      </Link>
+      </div>
       <h1 className="text-3xl font-bold mb-6 text-center font-mono text-purple-300">{coinDetails.name} ({coinDetails.symbol})</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
         <div className="bg-purple-900 p-6 rounded-lg shadow-lg">
