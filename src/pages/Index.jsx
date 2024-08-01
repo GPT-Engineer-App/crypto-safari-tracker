@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Search, Zap } from 'lucide-react';
+import { Search, Zap, ExternalLink } from 'lucide-react';
 
 const fetchCoins = async () => {
   const response = await axios.get('https://api.coincap.io/v2/assets');
@@ -56,9 +57,10 @@ const Index = () => {
               <TableRow key={coin.id} className="border-b border-purple-800 hover:bg-purple-900/50">
                 <TableCell className="font-mono">{coin.rank}</TableCell>
                 <TableCell className="font-medium font-mono">
-                  <div className="flex items-center">
+                  <Link to={`/crypto/${coin.id}`} className="flex items-center hover:text-purple-400">
                     {coin.symbol}
-                  </div>
+                    <ExternalLink className="ml-2 h-4 w-4" />
+                  </Link>
                 </TableCell>
                 <TableCell className="font-mono">${parseFloat(coin.priceUsd).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
                 <TableCell className={`font-mono ${parseFloat(coin.changePercent24Hr) > 0 ? 'text-green-400' : 'text-red-400'}`}>
