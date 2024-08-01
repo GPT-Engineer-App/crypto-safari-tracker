@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
@@ -13,12 +13,37 @@ const fetchCoins = async () => {
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const { data: coins, isLoading, isError } = useQuery({
+  const [liveCoins, setLiveCoins] = useState([]);
+  const { data: initialCoins, isLoading, isError } = useQuery({
     queryKey: ['coins'],
     queryFn: fetchCoins,
   });
 
-  const filteredCoins = coins?.filter(coin =>
+  useEffect(() => {
+    if (initialCoins) {
+      setLiveCoins(initialCoins);
+    }
+  }, [initialCoins]);
+
+  useEffect(() => {
+    const ws = new WebSocket('wss://ws.coincap.io/prices?assets=ALL');
+
+    ws.onmessage = (event) => {
+      const newPrices = JSON.parse(event.data);
+      setLiveCoins((prevCoins) =>
+        prevCoins.map((coin) => ({
+          ...coin,
+          priceUsd: newPrices[coin.id] || coin.priceUsd,
+        }))
+      );
+    };
+
+    return () => {
+      ws.close();
+    };
+  }, []);
+
+  const filteredCoins = liveCoins.filter(coin =>
     coin.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -53,7 +78,7 @@ const Index = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredCoins?.map((coin) => (
+            {filteredCoins.map((coin) => (
               <TableRow key={coin.id} className="border-b border-purple-800 hover:bg-purple-900/50">
                 <TableCell className="font-mono">{coin.rank}</TableCell>
                 <TableCell className="font-medium font-mono">
@@ -62,7 +87,11 @@ const Index = () => {
                     <ExternalLink className="ml-2 h-4 w-4" />
                   </Link>
                 </TableCell>
-                <TableCell className="font-mono">${parseFloat(coin.priceUsd).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
+                <TableCell className="font-mono">
+                  <span className="animate-pulse">
+                    ${parseFloat(coin.priceUsd).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                </TableCell>
                 <TableCell className={`font-mono ${parseFloat(coin.changePercent24Hr) > 0 ? 'text-green-400' : 'text-red-400'}`}>
                   {parseFloat(coin.changePercent24Hr).toFixed(2)}%
                 </TableCell>
