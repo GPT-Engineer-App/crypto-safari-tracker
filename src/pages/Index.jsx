@@ -7,8 +7,20 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Search, Zap, ExternalLink } from 'lucide-react';
 
 const fetchCoins = async () => {
-  const response = await axios.get('https://api.coincap.io/v2/assets');
+  const response = await axios.get('https://api.coincap.io/v2/assets?limit=100');
   return response.data.data;
+};
+
+const getTopGainers = (coins, limit = 5) => {
+  return [...coins]
+    .sort((a, b) => parseFloat(b.changePercent24Hr) - parseFloat(a.changePercent24Hr))
+    .slice(0, limit);
+};
+
+const getTopLosers = (coins, limit = 5) => {
+  return [...coins]
+    .sort((a, b) => parseFloat(a.changePercent24Hr) - parseFloat(b.changePercent24Hr))
+    .slice(0, limit);
 };
 
 const Index = () => {
@@ -96,6 +108,70 @@ const Index = () => {
                   {parseFloat(coin.changePercent24Hr).toFixed(2)}%
                 </TableCell>
                 <TableCell className="font-mono">${parseFloat(coin.marketCapUsd).toLocaleString(undefined, { maximumFractionDigits: 0 })}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12">
+      <div>
+        <h2 className="text-2xl font-bold mb-4 text-purple-300">Biggest Gainers</h2>
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-purple-900 border-b border-purple-700">
+              <TableHead className="text-purple-300">Asset</TableHead>
+              <TableHead className="text-purple-300">Price</TableHead>
+              <TableHead className="text-purple-300">24h Flux</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {getTopGainers(filteredCoins).map((coin) => (
+              <TableRow key={coin.id} className="border-b border-purple-800 hover:bg-purple-900/50">
+                <TableCell className="font-medium font-mono">
+                  <Link to={`/crypto/${coin.id}`} className="flex items-center hover:text-purple-400">
+                    {coin.symbol}
+                    <ExternalLink className="ml-2 h-4 w-4" />
+                  </Link>
+                </TableCell>
+                <TableCell className="font-mono">
+                  ${parseFloat(coin.priceUsd).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </TableCell>
+                <TableCell className="font-mono text-green-400">
+                  +{parseFloat(coin.changePercent24Hr).toFixed(2)}%
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      <div>
+        <h2 className="text-2xl font-bold mb-4 text-purple-300">Biggest Losers</h2>
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-purple-900 border-b border-purple-700">
+              <TableHead className="text-purple-300">Asset</TableHead>
+              <TableHead className="text-purple-300">Price</TableHead>
+              <TableHead className="text-purple-300">24h Flux</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {getTopLosers(filteredCoins).map((coin) => (
+              <TableRow key={coin.id} className="border-b border-purple-800 hover:bg-purple-900/50">
+                <TableCell className="font-medium font-mono">
+                  <Link to={`/crypto/${coin.id}`} className="flex items-center hover:text-purple-400">
+                    {coin.symbol}
+                    <ExternalLink className="ml-2 h-4 w-4" />
+                  </Link>
+                </TableCell>
+                <TableCell className="font-mono">
+                  ${parseFloat(coin.priceUsd).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </TableCell>
+                <TableCell className="font-mono text-red-400">
+                  {parseFloat(coin.changePercent24Hr).toFixed(2)}%
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
