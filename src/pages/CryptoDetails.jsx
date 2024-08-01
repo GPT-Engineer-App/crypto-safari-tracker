@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { ArrowLeft, Star } from 'lucide-react';
+import { ArrowLeft, Star, ShoppingCart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useToast } from "@/components/ui/use-toast";
@@ -67,9 +67,14 @@ const CryptoDetails = () => {
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to Assets
           </Button>
         </Link>
-        <Button variant="outline" onClick={addToFavorites}>
-          <Star className="mr-2 h-4 w-4" /> Add to Favorites
-        </Button>
+        <div>
+          <Button variant="outline" onClick={addToFavorites} className="mr-2">
+            <Star className="mr-2 h-4 w-4" /> Add to Favorites
+          </Button>
+          <Button variant="outline" as="a" href={`https://www.binance.com/en/trade/${coinDetails.symbol}_USDT`} target="_blank" rel="noopener noreferrer">
+            <ShoppingCart className="mr-2 h-4 w-4" /> Buy on Binance
+          </Button>
+        </div>
       </div>
       <h1 className="text-3xl font-bold mb-6 text-center font-mono text-purple-300">{coinDetails.name} ({coinDetails.symbol})</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
