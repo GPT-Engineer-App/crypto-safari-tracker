@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { Input } from '@/components/ui/input';
@@ -6,16 +6,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Search } from 'lucide-react';
 
 const fetchCoins = async () => {
-  const response = await axios.get('https://api.coingecko.com/api/v3/coins/markets', {
-    params: {
-      vs_currency: 'usd',
-      order: 'market_cap_desc',
-      per_page: 100,
-      page: 1,
-      sparkline: false,
-    },
-  });
-  return response.data;
+  const response = await axios.get('https://api.coincap.io/v2/assets');
+  return response.data.data;
 };
 
 const Index = () => {
@@ -48,6 +40,7 @@ const Index = () => {
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>Rank</TableHead>
             <TableHead>Coin</TableHead>
             <TableHead>Price</TableHead>
             <TableHead>24h Change</TableHead>
@@ -57,17 +50,17 @@ const Index = () => {
         <TableBody>
           {filteredCoins?.map((coin) => (
             <TableRow key={coin.id}>
+              <TableCell>{coin.rank}</TableCell>
               <TableCell className="font-medium">
                 <div className="flex items-center">
-                  <img src={coin.image} alt={coin.name} className="w-6 h-6 mr-2" />
-                  {coin.name}
+                  {coin.symbol}
                 </div>
               </TableCell>
-              <TableCell>${coin.current_price.toLocaleString()}</TableCell>
-              <TableCell className={coin.price_change_percentage_24h > 0 ? 'text-green-600' : 'text-red-600'}>
-                {coin.price_change_percentage_24h.toFixed(2)}%
+              <TableCell>${parseFloat(coin.priceUsd).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
+              <TableCell className={parseFloat(coin.changePercent24Hr) > 0 ? 'text-green-600' : 'text-red-600'}>
+                {parseFloat(coin.changePercent24Hr).toFixed(2)}%
               </TableCell>
-              <TableCell>${coin.market_cap.toLocaleString()}</TableCell>
+              <TableCell>${parseFloat(coin.marketCapUsd).toLocaleString(undefined, { maximumFractionDigits: 0 })}</TableCell>
             </TableRow>
           ))}
         </TableBody>
